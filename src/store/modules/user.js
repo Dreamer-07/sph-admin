@@ -14,6 +14,7 @@ const state = getDefaultState()
 
 const mutations = {
   RESET_STATE: (state) => {
+    console.log(111111)
     Object.assign(state, getDefaultState())
   },
   SET_TOKEN: (state, token) => {
@@ -28,54 +29,49 @@ const mutations = {
 }
 
 const actions = {
-  // user login
-  login({ commit }, userInfo) {
+  // 用户登录
+  async login({ commit }, userInfo) {
     const { username, password } = userInfo
-    return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
-    })
+    const result = await login({ username: username.trim(), password })
+    if (result.code === 20000) {
+      const { token } = result.data
+      commit('SET_TOKEN', token)
+      setToken(token)
+      return Promise.resolve('success')
+    } else {
+      return Promise.reject('faild')
+    }
   },
 
   // get user info
-  getInfo({ commit, state }) {
-    return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
-        const { data } = response
+  async getInfo({ commit, state }) {
+    const result = await getInfo(state.token)
+    if (result.code === 20000) {
+      const { data } = result
+      if (!data) {
+        return Promise.reject('Verification failed, please Login again.')
+      }
+      const { name, avatar } = data
 
-        if (!data) {
-          return reject('Verification failed, please Login again.')
-        }
-
-        const { name, avatar } = data
-
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        resolve(data)
-      }).catch(error => {
-        reject(error)
-      })
-    })
+      commit('SET_NAME', name)
+      commit('SET_AVATAR', avatar)
+      return Promise.resolve('scuuess')
+    } else {
+      return Promise.reject('faild')
+    }
   },
 
   // user logout
-  logout({ commit, state }) {
-    return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
-        removeToken() // must remove  token  first
-        resetRouter()
-        commit('RESET_STATE')
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
-    })
+  async logout({ commit, state }) {
+    const result = await logout(state.token)
+    if (result.code === 20000) {
+      removeToken() // must remove  token  first
+      resetRouter()
+      commit('RESET_STATE')
+      return Promise.resolve('success')
+    } else {
+      return Promise.reject('faild')
+    }
   },
 
   // remove token

@@ -36,6 +36,7 @@ router.beforeEach(async(to, from, next) => {
 
           next()
         } catch (error) {
+          console.log(1)
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')
           Message.error(error || 'Has Error')

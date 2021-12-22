@@ -15,6 +15,9 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+import api from '@/api' // api request
+Vue.prototype.$api = api // use api
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
