@@ -7,6 +7,11 @@ export default {
     url: `/admin/product/baseTrademark/${page}/${limit}`,
     method: 'get'
   }),
+  // 获取所有品牌信息
+  getAllBrandInfo: () => request({
+    url: `${apiName}/getTrademarkList`,
+    method: 'get'
+  }),
   // 保存品牌信息
   saveBrandInfo: ({ tmName, logoUrl }) => request({
     url: `${apiName}/save`,

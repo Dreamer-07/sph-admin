@@ -38,7 +38,9 @@ Vue.use(ElementUI, { locale })
 
 // 配置全局组件
 import CategorySelect from '@/components/CategorySelect'
+import MiniButton from '@/components/MiniButton'
 Vue.component(CategorySelect.name, CategorySelect)
+Vue.component(MiniButton.name, MiniButton)
 
 Vue.config.productionTip = false
 

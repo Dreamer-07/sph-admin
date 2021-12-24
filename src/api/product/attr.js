@@ -27,5 +27,10 @@ export default {
     url: `${apiName}/saveAttrInfo`,
     method: 'post',
     data: attrInfo
+  }),
+  // 获取所有销售属性
+  getBaseSaleAttrList: () => request({
+    url: `${apiName}/baseSaleAttrList`,
+    method: 'get'
   })
 }
