@@ -52,11 +52,15 @@
           <el-table-column label="spu描述" prop="description"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="{ row }">
-              <MiniButton type="success" icon="el-icon-plus" size="mini" title="添加 sku 信息"/>
+              <MiniButton type="success" icon="el-icon-plus" size="mini" title="添加 sku 信息"
+                          @click="showSkuForm(row)"
+              />
               <MiniButton type="warning" icon="el-icon-edit" size="mini" title="修改 sku 信息"
                           @click="initEditForm(row.id)"
               />
-              <MiniButton type="info" icon="el-icon-info" size="mini" title="查看当前 spu 相关的 sku 列表"/>
+              <MiniButton type="info" icon="el-icon-info" size="mini" title="查看当前 spu 相关的 sku 列表"
+                          @click="showSkuList(row)"
+              />
               <el-popconfirm :title="`确定删除[${row.spuName}]SPU属性吗`" @onConfirm="deleteSpuInfo(row.id)">
                 <MiniButton slot="reference" type="danger" icon="el-icon-delete" size="mini" title="删除 spu"/>
               </el-popconfirm>
@@ -79,8 +83,21 @@
 
       <SpuForm v-show="sceneType === 1" ref="spu-form" @updateSceneType="updateSceneType"/>
 
-      <SkuForm v-show="sceneType === 2"/>
+      <SkuForm v-show="sceneType === 2" ref="sku-form" @updateSceneType="updateSceneType"/>
     </el-card>
+
+    <el-dialog :title="`${selectedSpuName}商品的 sku 列表`" :visible.sync="dialogTableVisible" @close="closeDialog">
+      <el-table :data="skuInfoList" v-loading="loading">
+        <el-table-column prop="skuName" label="名称"></el-table-column>
+        <el-table-column prop="price" label="价格"></el-table-column>
+        <el-table-column prop="weight" label="重量"></el-table-column>
+        <el-table-column label="默认图片">
+          <template slot-scope="{ row }">
+            <img :src="row.skuDefaultImg" :alt="row.skuName" style="width: 100px; height: 100px;"/>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -105,7 +122,11 @@ export default {
       total: 0,
       pageSize: 3,
       spuInfoList: [],
-      sceneType: 0 // 切换场景: [0 - 查看 spu 信息; 1 - 修改/新增 spu; 2 - 新增 sku]
+      sceneType: 0, // 切换场景: [0 - 查看 spu 信息; 1 - 修改/新增 spu; 2 - 新增 sku]
+      dialogTableVisible: false,
+      selectedSpuName: '',
+      skuInfoList: [],
+      loading: true
     }
   },
   mounted() {
@@ -195,6 +216,29 @@ export default {
           message: e.message
         })
       }
+    },
+    // 显示 sku form
+    showSkuForm({ id, spuName, tmId }) {
+      this.sceneType = 2
+      this.$refs['sku-form'].initFormData({ ...this.selectCategoryForm, spuId: id, spuName, tmId })
+    },
+    // 展示 sku list
+    async showSkuList({ id, spuName }) {
+      this.dialogTableVisible = true
+      this.selectedSpuName = spuName
+      // 发送请求
+      try {
+        const result = await this.$api.sku.getSkuListBySpuId(id)
+        this.skuInfoList = result.data
+        this.loading = false
+      } catch (e) {
+        this.$message.error(e.message)
+      }
+    },
+    // 关闭弹窗
+    closeDialog() {
+      this.loading = true
+      this.skuInfoList = []
     }
   }
 }

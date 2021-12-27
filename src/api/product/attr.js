@@ -32,5 +32,10 @@ export default {
   getBaseSaleAttrList: () => request({
     url: `${apiName}/baseSaleAttrList`,
     method: 'get'
+  }),
+  // 获取 spu 的销售属性
+  getSpuAttrList: (spuId) => request({
+    url: `${apiName}/spuSaleAttrList/${spuId}`,
+    method: 'get'
   })
 }

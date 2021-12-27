@@ -1,5 +1,5 @@
 <template>
-  <span>Sku 管理</span>
+  <div></div>
 </template>
 
 <script>
