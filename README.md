@@ -65,3 +65,64 @@ TODO：https://segmentfault.com/a/1190000018874254
 还是以 **华为P40 5G手机** 为例，我们将它的私有属性设置为 **[ 颜色: 零度白; 版本: 全网通(8G + 128G) ]** 就能确定一个具体的商品
 
 ![image-20211223141223208](README.assets/image-20211223141223208.png)
+
+### Vue 使用 Echarts
+
+1. 安装依赖 
+
+   ```powershell
+   npm install --save echarts
+   ```
+
+2. 在组件中引入
+
+   ```javascript
+   import echarts from 'echarts'
+   ```
+
+3. 在组件挂载 `mounted()` 之后初始化 echarts
+
+   ```javascript
+   mounted() {
+       this.saleEchart = echarts.init(this.$refs['sale-charts'])
+       this.saleEchart.setOption({
+           title: {
+               text: '销售额趋势'
+           },
+           tooltip: {
+               trigger: 'axis',
+               axisPointer: {
+                   type: 'shadow'
+               }
+           },
+           grid: {
+               left: '3%',
+               right: '4%',
+               bottom: '3%',
+               containLabel: true
+           },
+           xAxis: [
+               {
+                   type: 'category',
+                   data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                   axisTick: {
+                       alignWithLabel: true
+                   }
+               }
+           ],
+           yAxis: [
+               {
+                   type: 'value'
+               }
+           ],
+           series: [
+               {
+                   name: 'Direct',
+                   type: 'bar',
+                   barWidth: '60%',
+                   data: [10, 52, 200, 334, 390, 330, 220, 88, 99, 110, 76, 99]
+               }
+           ]
+       })
+   }
+

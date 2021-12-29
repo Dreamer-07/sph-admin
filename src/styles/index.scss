@@ -59,6 +59,11 @@ div:focus {
   }
 }
 
+ul, li {
+  list-style: none;
+  padding: 0;
+}
+
 // main-container global css
 .app-main {
   padding: 20px;
