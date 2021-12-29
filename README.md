@@ -9,6 +9,14 @@
 - http://39.98.123.211:8170/swagger-ui.html
 - http://39.98.123.211:8216/swagger-ui.html
 
+技术点：
+
+- Vue
+- ElementUI
+- Echarts
+- Moment(处理日期时间)
+- 概念：SPU & SKU
+
 ## 基础知识补充 
 
 ### 深拷贝与浅拷贝
@@ -126,3 +134,43 @@ TODO：https://segmentfault.com/a/1190000018874254
        })
    }
 
+### Vue Router 动态切换路由
+
+1.  `router/index.js` 中拆分静态路由和动态路由
+
+   ![image-20211229203123333](README.assets/image-20211229203123333.png)
+
+2. 在获取用户信息(UserInfo)时需要和后端数据搭配，**筛选出用户可以访问的路由**
+
+   ```javascript
+   import { resetRouter, constantRoutes, asyncRoutes } from '@/router'
+   import router from '@/router'
+   
+   
+   
+   // ----mutations
+   // 获取可以访问的路由配置信息
+   state.canVisitRoutes = constantRoutes.concat(filterInvalidRoutes(userInfo.routes))
+   // 添加新路由
+   router.addRoutes(state.canVisitRoutes)
+   // ----mutations
+   
+   
+   
+   
+   /*
+   * targetRouters - 需要过滤的数组
+   * */
+   const filterInvalidRoutes = function(targetRoutes, ar = asyncRoutes) {
+       return ar.filter(item => {
+           if (item.children && item.children.length > 0) {
+               item.children = filterInvalidRoutes(targetRoutes, item.children)
+           }
+           return targetRoutes.indexOf(item.name) !== -1
+       })
+   }
+   ```
+
+   注意：这里需要和后端协商好，数据库中需要记录的是**路由的 Name**，以便筛选
+
+   

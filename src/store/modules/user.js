@@ -1,12 +1,17 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { resetRouter } from '@/router'
+import { resetRouter, constantRoutes, asyncRoutes } from '@/router'
+import router from '@/router'
 
 const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: ''
+    avatar: '',
+    buttons: [], // 用户可以使用的按钮
+    routes: [], // 用户可以访问的路由
+    roles: [], // 用户的角色
+    canVisitRoutes: [] // 可以访问的路由配置
   }
 }
 
@@ -14,17 +19,17 @@ const state = getDefaultState()
 
 const mutations = {
   RESET_STATE: (state) => {
-    console.log(111111)
     Object.assign(state, getDefaultState())
   },
   SET_TOKEN: (state, token) => {
     state.token = token
   },
-  SET_NAME: (state, name) => {
-    state.name = name
-  },
-  SET_AVATAR: (state, avatar) => {
-    state.avatar = avatar
+  SET_USERINFO: (state, userInfo) => {
+    // 获取可以访问的路由配置信息
+    state.canVisitRoutes = constantRoutes.concat(filterInvalidRoutes(userInfo.routes))
+    // 添加新路由
+    router.addRoutes(state.canVisitRoutes)
+    Object.assign(state, userInfo)
   }
 }
 
@@ -48,13 +53,7 @@ const actions = {
     const result = await getInfo(state.token)
     if (result.code === 20000) {
       const { data } = result
-      if (!data) {
-        return Promise.reject('Verification failed, please Login again.')
-      }
-      const { name, avatar } = data
-
-      commit('SET_NAME', name)
-      commit('SET_AVATAR', avatar)
+      commit('SET_USERINFO', data)
       return Promise.resolve('scuuess')
     } else {
       return Promise.reject('faild')
@@ -82,6 +81,18 @@ const actions = {
       resolve()
     })
   }
+}
+
+/*
+* targetRouters - 需要过滤的数组
+* */
+const filterInvalidRoutes = function(targetRoutes, ar = asyncRoutes) {
+  return ar.filter(item => {
+    if (item.children && item.children.length > 0) {
+      item.children = filterInvalidRoutes(targetRoutes, item.children)
+    }
+    return targetRoutes.indexOf(item.name) !== -1
+  })
 }
 
 export default {
